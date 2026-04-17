@@ -1,4 +1,4 @@
-# BQ76942EVM
+# BQ76952EVM
 
 High accuracy battery monitor and protector for 3-cell to 16-cell Li-ion or Li-polymer battery packs.
 
