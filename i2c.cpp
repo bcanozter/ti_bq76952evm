@@ -2,12 +2,14 @@
 
 #include <cstdint>
 #include <fcntl.h>
+#include <iostream>
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
 static int     fd       = -1;
 static uint8_t dev_addr = 0;
+#define BQ_I2C_ADDR 0x08
 
 bool i2c_open(const char *dev) {
   fd = open(dev, O_RDWR);
@@ -35,4 +37,19 @@ bool i2c_read(uint8_t reg, uint8_t *data, uint8_t len) {
   if (write(fd, &reg, 1) != 1) { return false; }
   usleep(1000);
   return read(fd, data, len) == len;
+}
+
+bool i2c_init(const char *device) {
+  if (device == NULL) { return 1; }
+
+  if (!i2c_open(device)) {
+    std::cerr << "I2C open failed\n";
+    return 1;
+  }
+
+  if (!i2c_set_addr(BQ_I2C_ADDR)) {
+    std::cerr << "BQ_I2C_ADDR set failed\n";
+    return 1;
+  }
+  return 0;
 }
