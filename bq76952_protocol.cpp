@@ -23,6 +23,38 @@ void BQ76952_init() {
   raw = (RX_32Byte[1]) << 8 | RX_32Byte[0];
   std::cout << "Device Number: 0x" << std::hex << raw
             << std::endl;
+
+  usleep(2000);
+  memset(RX_data, 0, sizeof(RX_data));
+  direct_command(CMD_CC2_CURRENT, 0x00, READ, RX_data);
+  raw = (RX_data[1] << 8) | RX_data[0];
+  std::cout << "CC2 Current Reading: " << raw << std::endl;
+
+  usleep(2000);
+  memset(RX_data, 0, sizeof(RX_data));
+  direct_command(CMD_CELL1_VOLTAGE, 0x00, READ, RX_data);
+  raw = (RX_data[1] << 8) | RX_data[0];
+  std::cout << "Cell 1 Voltage Reading: " << std::dec << raw
+            << std::endl;
+
+  usleep(2000);
+  memset(RX_data, 0, sizeof(RX_data));
+  direct_command(CMD_ALARM_ENABLE, 0x00, READ, RX_data);
+  raw = (RX_data[1] << 8) | RX_data[0];
+  std::cout << "Alarm Enable Reading: 0x" << std::hex << raw
+            << std::endl;
+
+  usleep(2000);
+  direct_command(CMD_ALARM_ENABLE, 0xF802, WRITE, RX_data);
+
+  usleep(2000);
+  memset(RX_data, 0, sizeof(RX_data));
+  direct_command(CMD_ALARM_ENABLE, 0x00, READ, RX_data);
+  raw = (RX_data[1] << 8) | RX_data[0];
+  std::cout << "Alarm Enable Reading: 0x" << std::hex << raw
+            << std::endl;
+
+  command_subcommand(RESET);
 }
 
 void direct_command(uint8_t command, uint16_t data,
@@ -41,6 +73,7 @@ void direct_command(uint8_t command, uint16_t data,
       memcpy(rx_result, RX_data, sizeof(RX_data));
     }
   }
+  if (type == WRITE) { i2c_write(command, TX_data, 2); }
 }
 
 void subcommand(uint16_t command, uint16_t data,
@@ -61,4 +94,15 @@ void subcommand(uint16_t command, uint16_t data,
       memcpy(rx_result, RX_32Byte, sizeof(RX_32Byte));
     }
   }
+}
+
+void command_subcommand(uint16_t command) {
+  uint8_t TX_Reg[2] = {0x00, 0x00};
+
+  // TX_Reg in little endian format
+  TX_Reg[0] = command & 0xff;
+  TX_Reg[1] = (command >> 8) & 0xff;
+
+  i2c_write(0x3E, TX_Reg, 2);
+  usleep(2000);
 }

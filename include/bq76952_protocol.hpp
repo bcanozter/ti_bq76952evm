@@ -26,6 +26,8 @@
 #define CMD_PACK_PIN_VOLTAGE 0x38
 #define CMD_LD_PIN_VOLTAGE 0x31
 
+#define CMD_CC2_CURRENT 0x3A
+
 #define CMD_INTERNAL_TEMP 0x68 // unit 0.1K
 #define CMD_TS1_TEMP 0x70      // unit 0.1K
 #define CMD_TS2_TEMP 0x72      // unit 0.1K
@@ -37,6 +39,11 @@
 #define SUB_CMD_FET_ENABLE 0x0022
 #define SUB_CMD_RESET 0x0012
 
+// Command Subcommand
+#define SET_CFGUPDATE 0x0090
+#define EXIT_CFGUPDATE 0x0092
+#define FET_ENABLE 0x0022
+#define RESET 0x0012
 //
 #define READ 0  // Read
 #define WRITE 1 // Write
@@ -47,3 +54,4 @@ void direct_command(uint8_t command, uint16_t data,
                     uint8_t type, unsigned char *rx_result);
 void subcommand(uint16_t command, uint16_t data,
                 uint8_t type, unsigned char *rx_result);
+void command_subcommand(uint16_t command);
